@@ -1,0 +1,1044 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>琳琳成长日志</title>
+    <link href="https://fonts.googleapis.com/css2?family=ZCOOL+KuaiLe&family=Nunito:wght@400;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --primary: #FF8FAB;
+            --primary-light: #FFB3C6;
+            --secondary: #BDE0FE;
+            --accent: #CDB4DB;
+            --bg: #FFF0F3;
+            --card: #FFFFFF;
+            --text: #5A4A5A;
+            --text-light: #8B7D8B;
+            --success: #95D5B2;
+            --warning: #FFD6A5;
+            --danger: #FFADAD;
+            --shadow: 0 4px 15px rgba(255, 143, 171, 0.15);
+        }
+        * { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+        body {
+            font-family: 'Nunito', 'ZCOOL KuaiLe', sans-serif;
+            background: var(--bg);
+            color: var(--text);
+            min-height: 100vh;
+            overflow-x: hidden;
+            padding-bottom: 80px;
+            touch-action: manipulation;
+            -webkit-tap-highlight-color: transparent;
+        }
+        .floating-hearts {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            pointer-events: none; z-index: 0; overflow: hidden;
+        }
+        .floating-hearts span {
+            position: absolute; font-size: 20px;
+            animation: float 15s infinite ease-in-out; opacity: 0.3;
+        }
+        @keyframes float {
+            0%, 100% { transform: translateY(100vh) rotate(0deg); opacity: 0; }
+            10% { opacity: 0.3; }
+            90% { opacity: 0.3; }
+            50% { transform: translateY(-10vh) rotate(180deg); }
+        }
+        .header {
+            background: linear-gradient(135deg, var(--primary) 0%, var(--primary-light) 100%);
+            padding: 20px; text-align: center; position: relative; z-index: 1;
+            box-shadow: var(--shadow);
+        }
+        .header h1 { font-size: 1.8rem; color: white; text-shadow: 2px 2px 4px rgba(0,0,0,0.1); animation: bounce 2s infinite; }
+        @keyframes bounce { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-5px); } }
+        .header .subtitle { color: rgba(255,255,255,0.9); font-size: 0.85rem; margin-top: 5px; }
+        .score-display { display: inline-flex; align-items: center; gap: 8px; background: rgba(255,255,255,0.3); padding: 8px 20px; border-radius: 20px; margin-top: 10px;  }
+        .score-display .star { font-size: 1.2rem; }
+        .score-display .score-value { font-size: 1.3rem; font-weight: 700; color: white; }
+        .slogan { text-align: center; padding: 15px; font-size: 0.9rem; color: var(--text-light); font-style: italic; position: relative; z-index: 1; }
+        .slogan::before, .slogan::after { content: "✨"; margin: 0 8px; }
+        .page { display: none; padding: 15px; position: relative; z-index: 1; animation: fadeIn 0.4s ease; }
+        .page.active { display: block; }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
+        .card { background: var(--card); border-radius: 20px; padding: 20px; margin-bottom: 15px; box-shadow: var(--shadow); position: relative; overflow: hidden; }
+        .card::before { content: ""; position: absolute; top: 0; left: 0; right: 0; height: 4px; background: linear-gradient(90deg, var(--primary), var(--secondary), var(--accent)); border-radius: 20px 20px 0 0; }
+        .card-title { font-size: 1.1rem; font-weight: 700; margin-bottom: 15px; display: flex; align-items: center; gap: 8px; }
+        .card-title .icon { font-size: 1.3rem; }
+        .check-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+        .check-btn { background: linear-gradient(135deg, var(--primary-light) 0%, var(--primary) 100%); border: none; border-radius: 16px; padding: 20px 15px; color: white; font-size: 1rem; font-weight: 700; cursor: pointer; font-family: inherit; display: flex; flex-direction: column; align-items: center; gap: 5px; box-shadow: 0 4px 10px rgba(255, 143, 171, 0.3); }
+        .check-btn .emoji { font-size: 2rem; }
+        .check-btn .label { font-size: 0.85rem; }
+        .check-btn .status { font-size: 0.75rem; opacity: 0.9; }
+        .check-btn:active { transform: scale(0.95); }
+        .check-btn.completed { background: linear-gradient(135deg, var(--success) 0%, #7EB89A 100%); box-shadow: 0 4px 10px rgba(149, 213, 178, 0.3); }
+        .form-group { margin-bottom: 15px; }
+        .form-label { display: block; font-size: 0.9rem; font-weight: 700; margin-bottom: 8px; color: var(--text); }
+        .form-input, .form-select, .form-textarea { width: 100%; padding: 12px 15px; border: 2px solid var(--primary-light); border-radius: 12px; font-size: 1rem; font-family: inherit; background: white; -webkit-appearance: none; }
+        .form-input:focus, .form-select:focus, .form-textarea:focus { outline: none; border-color: var(--primary); }
+        .form-textarea { min-height: 80px; resize: vertical; }
+        .photo-upload { border: 3px dashed var(--primary-light); border-radius: 16px; padding: 30px; text-align: center; cursor: pointer; background: rgba(255, 179, 198, 0.05); }
+        .photo-upload:active { background: rgba(255, 179, 198, 0.1); }
+        .photo-upload .upload-icon { font-size: 2.5rem; margin-bottom: 10px; }
+        .photo-upload .upload-text { color: var(--text-light); font-size: 0.9rem; }
+        .photo-upload.has-image { border-style: solid; border-color: var(--success); padding: 10px; }
+        .photo-upload.has-image img { max-width: 100%; border-radius: 12px; max-height: 200px; object-fit: cover; }
+        .photo-input { opacity: 0; position: absolute; width: 0; height: 0; z-index: -1; }
+        .submit-btn { width: 100%; padding: 15px; background: linear-gradient(135deg, var(--primary) 0%, var(--primary-light) 100%); border: none; border-radius: 16px; color: white; font-size: 1.1rem; font-weight: 700; cursor: pointer; font-family: inherit; box-shadow: var(--shadow); margin-top: 10px; }
+        .submit-btn:active { transform: scale(0.98); }
+        .progress-container { margin: 20px 0; }
+        .progress-item { margin-bottom: 20px; }
+        .progress-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px; }
+        .progress-title { font-weight: 700; font-size: 0.95rem; }
+        .progress-reward { font-size: 0.8rem; color: var(--primary); font-weight: 700; }
+        .progress-bar-bg { height: 20px; background: #FFE5EC; border-radius: 10px; overflow: hidden; position: relative; }
+        .progress-bar-fill { height: 100%; border-radius: 10px; background: linear-gradient(90deg, var(--primary) 0%, var(--primary-light) 100%); transition: width 0.6s cubic-bezier(0.4, 0, 0.2, 1); position: relative; }
+        .progress-bar-fill::after { content: ""; position: absolute; top: 0; left: 0; right: 0; bottom: 0; background: linear-gradient(90deg, transparent 0%, rgba(255,255,255,0.3) 50%, transparent 100%); animation: shimmer 2s infinite; }
+        @keyframes shimmer { 0% { transform: translateX(-100%); } 100% { transform: translateX(100%); } }
+        .progress-text { text-align: center; font-size: 0.8rem; color: var(--text-light); margin-top: 5px; }
+        .progress-locked { opacity: 0.6; filter: grayscale(0.5); }
+        .unlocked-badge { display: inline-block; background: var(--success); color: white; padding: 2px 8px; border-radius: 10px; font-size: 0.7rem; margin-left: 5px; }
+        .record-list { max-height: 60vh; overflow-y: auto; -webkit-overflow-scrolling: touch; }
+        .record-item { background: rgba(255, 255, 255, 0.8); border-radius: 14px; padding: 15px; margin-bottom: 10px; display: flex; gap: 12px; align-items: flex-start; cursor: pointer; border: 2px solid transparent; }
+        .record-item:active { transform: scale(0.98); }
+        .record-item .record-icon { width: 45px; height: 45px; border-radius: 12px; display: flex; align-items: center; justify-content: center; font-size: 1.5rem; flex-shrink: 0; }
+        .record-item .record-content { flex: 1; }
+        .record-item .record-title { font-weight: 700; font-size: 0.95rem; margin-bottom: 3px; }
+        .record-item .record-time { font-size: 0.75rem; color: var(--text-light); }
+        .record-item .record-score { font-size: 0.85rem; font-weight: 700; padding: 4px 10px; border-radius: 10px; flex-shrink: 0; }
+        .score-positive { background: rgba(149, 213, 178, 0.3); color: #2D6A4F; }
+        .score-negative { background: rgba(255, 173, 173, 0.3); color: #9B2335; }
+        .modal-overlay { position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.5); z-index: 1000; display: none; align-items: center; justify-content: center; padding: 20px;  }
+        .modal-overlay.active { display: flex; }
+        .modal-content { background: white; border-radius: 24px; padding: 25px; width: 100%; max-width: 400px; max-height: 80vh; overflow-y: auto; animation: modalIn 0.3s ease; position: relative; }
+        @keyframes modalIn { from { transform: scale(0.8); opacity: 0; } to { transform: scale(1); opacity: 1; } }
+        .modal-close { position: absolute; top: 15px; right: 15px; width: 32px; height: 32px; border-radius: 50%; background: var(--bg); border: none; font-size: 1.2rem; cursor: pointer; display: flex; align-items: center; justify-content: center; }
+        .modal-title { font-size: 1.2rem; font-weight: 700; margin-bottom: 15px; padding-right: 30px; }
+        .modal-image { width: 100%; border-radius: 16px; margin-bottom: 15px; max-height: 300px; object-fit: cover; }
+        .modal-detail { margin-bottom: 10px; font-size: 0.9rem; }
+        .modal-detail .label { font-weight: 700; color: var(--text-light); }
+        .export-section { text-align: center; padding: 20px; }
+        .export-btn { display: inline-flex; align-items: center; gap: 8px; padding: 15px 30px; background: linear-gradient(135deg, var(--secondary) 0%, #A2D2FF 100%); border: none; border-radius: 16px; color: white; font-size: 1rem; font-weight: 700; cursor: pointer; font-family: inherit; box-shadow: var(--shadow); margin: 10px; }
+        .export-btn.qr-btn { background: linear-gradient(135deg, var(--accent) 0%, #E0BBE4 100%); }
+        .qr-display { margin-top: 20px; padding: 20px; background: white; border-radius: 20px; display: none; }
+        .qr-display.active { display: block; }
+        #qrcode { display: flex; justify-content: center; margin: 15px 0; }
+        .key-input-section { margin-top: 20px; padding: 20px; background: linear-gradient(135deg, rgba(255, 214, 165, 0.2) 0%, rgba(255, 173, 173, 0.2) 100%); border-radius: 20px; }
+        .key-input { display: flex; gap: 10px; margin-top: 10px; }
+        .key-input input { flex: 1; padding: 12px; border: 2px solid var(--warning); border-radius: 12px; font-size: 1rem; text-align: center; letter-spacing: 2px; font-family: inherit; }
+        .key-input button { padding: 12px 20px; background: var(--warning); border: none; border-radius: 12px; font-weight: 700; cursor: pointer; font-family: inherit; color: var(--text); }
+        .nav-bar { position: fixed; bottom: 0; left: 0; right: 0; background: white; display: flex; justify-content: space-around; padding: 10px 0; box-shadow: 0 -4px 20px rgba(0,0,0,0.08); z-index: 100; border-radius: 20px 20px 0 0; }
+        .nav-item { flex: 1; text-align: center; padding: 8px; cursor: pointer; border: none; background: none; font-family: inherit; color: var(--text-light); }
+        .nav-item.active { color: var(--primary); }
+        .nav-item .nav-icon { font-size: 1.5rem; display: block; margin-bottom: 3px; transition: transform 0.3s; }
+        .nav-item.active .nav-icon { transform: translateY(-5px) scale(1.1); }
+        .nav-item .nav-label { font-size: 0.7rem; font-weight: 700; }
+        .toast { position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%) scale(0); background: rgba(0,0,0,0.8); color: white; padding: 15px 25px; border-radius: 16px; font-size: 1rem; z-index: 2000; transition: transform 0.3s; text-align: center; max-width: 80%; }
+        .toast.show { transform: translate(-50%, -50%) scale(1); }
+        .toast.success { background: rgba(45, 106, 79, 0.9); }
+        .toast.error { background: rgba(155, 35, 53, 0.9); }
+        .stats-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 15px; }
+        .stat-card { background: white; border-radius: 16px; padding: 15px; text-align: center; box-shadow: var(--shadow); }
+        .stat-card .stat-value { font-size: 1.5rem; font-weight: 700; color: var(--primary); }
+        .stat-card .stat-label { font-size: 0.8rem; color: var(--text-light); margin-top: 5px; }
+        .empty-state { text-align: center; padding: 40px 20px; color: var(--text-light); }
+        .empty-state .empty-icon { font-size: 3rem; margin-bottom: 10px; opacity: 0.5; }
+        @media (max-width: 380px) { .check-grid { grid-template-columns: 1fr; } .header h1 { font-size: 1.5rem; } }
+
+        .login-page {
+            position: fixed; top: 0; left: 0; right: 0; bottom: 0;
+            background: linear-gradient(135deg, var(--primary) 0%, var(--primary-light) 100%);
+            display: flex; align-items: center; justify-content: center; z-index: 10000;
+            padding: 20px;
+        }
+        .login-page.hidden { display: none; }
+        .login-card {
+            background: var(--card); border-radius: 24px; padding: 35px 25px;
+            width: 100%; max-width: 360px; box-shadow: var(--shadow); text-align: center;
+        }
+        .login-title { font-size: 1.6rem; font-weight: 700; color: var(--primary); margin-bottom: 5px; }
+        .login-subtitle { font-size: 0.85rem; color: var(--text-light); margin-bottom: 25px; }
+        .login-form-group { margin-bottom: 18px; text-align: left; }
+        .login-label { display: block; font-size: 0.85rem; font-weight: 700; margin-bottom: 6px; color: var(--text); }
+        .login-input { width: 100%; padding: 12px 15px; border: 2px solid var(--primary-light); border-radius: 12px; font-size: 1rem; font-family: inherit; -webkit-appearance: none; }
+        .login-input:focus { outline: none; border-color: var(--primary); }
+        .login-btn { width: 100%; padding: 14px; background: linear-gradient(135deg, var(--primary) 0%, var(--primary-light) 100%); border: none; border-radius: 14px; color: white; font-size: 1rem; font-weight: 700; cursor: pointer; font-family: inherit; margin-top: 5px; }
+        .login-btn.secondary { background: white; color: var(--primary); border: 2px solid var(--primary-light); margin-top: 10px; }
+        .login-btn:active { transform: scale(0.98); }
+        .login-tabs { display: flex; gap: 10px; margin-bottom: 20px; }
+        .login-tab { flex: 1; padding: 10px; border: none; background: none; font-family: inherit; font-size: 0.9rem; font-weight: 700; color: var(--text-light); border-bottom: 2px solid transparent; cursor: pointer; }
+        .login-tab.active { color: var(--primary); border-bottom-color: var(--primary); }
+        .user-info { display: flex; align-items: center; gap: 8px; background: rgba(255,255,255,0.3); padding: 6px 14px; border-radius: 20px; margin-top: 8px; font-size: 0.85rem; color: white; }
+
+        .login-btn.loading {
+            background: linear-gradient(135deg, #aaa 0%, #ccc 100%);
+            cursor: not-allowed;
+            opacity: 0.7;
+        }
+        .login-btn.loading::after {
+            content: "";
+            display: inline-block;
+            width: 14px;
+            height: 14px;
+            border: 2px solid rgba(255,255,255,0.3);
+            border-top-color: white;
+            border-radius: 50%;
+            animation: spin 0.8s linear infinite;
+            margin-left: 8px;
+            vertical-align: middle;
+        }
+        @keyframes spin { to { transform: rotate(360deg); } }
+    </style>
+</head>
+<body>
+    <div class="floating-hearts" id="hearts"></div>
+    <div class="login-page" id="loginPage">
+        <div class="login-card">
+            <div class="login-title">🌸 琳琳成长日志</div>
+            <div class="login-subtitle">请先登录或注册账号</div>
+            <div class="login-tabs">
+                <button class="login-tab active" onclick="switchLoginTab('login')" id="tab-login">登录</button>
+                <button class="login-tab" onclick="switchLoginTab('register')" id="tab-register">注册</button>
+            </div>
+            <div id="loginForm">
+                <div class="login-form-group">
+                    <label class="login-label">账号</label>
+                    <input type="text" class="login-input" id="loginUsername" placeholder="输入账号">
+                </div>
+                <div class="login-form-group">
+                    <label class="login-label">密码</label>
+                    <input type="password" class="login-input" id="loginPassword" placeholder="输入密码">
+                </div>
+                <div style="display:flex; align-items:center; gap:6px; margin:10px 0; font-size:0.8rem; color:var(--text-light);">
+                    <input type="checkbox" id="rememberMe" style="width:16px;height:16px;cursor:pointer;">
+                    <label for="rememberMe" style="cursor:pointer;">记住密码</label>
+                </div>
+                <button class="login-btn" onclick="doLogin()">登录</button>
+            </div>
+            <div id="registerForm" style="display:none;">
+                <div class="login-form-group">
+                    <label class="login-label">新账号</label>
+                    <input type="text" class="login-input" id="regUsername" placeholder="设置账号">
+                </div>
+                <div class="login-form-group">
+                    <label class="login-label">密码</label>
+                    <input type="password" class="login-input" id="regPassword" placeholder="设置密码">
+                </div>
+                <div class="login-form-group">
+                    <label class="login-label">确认密码</label>
+                    <input type="password" class="login-input" id="regPassword2" placeholder="再次输入密码">
+                </div>
+                <button class="login-btn" onclick="doRegister()">注册账号</button>
+            </div>
+        </div>
+    </div>
+
+    <div class="header">
+        <h1>🌸 琳琳成长日志 🌸</h1>
+        <div class="subtitle">每一天都是更好的自己 ✨</div>
+        <div class="score-display">
+            <span class="star">⭐</span>
+            <span class="score-value" id="totalScore">0</span>
+            <span style="color:white; font-size:0.9rem">分</span>
+        </div><div class="user-info" id="userInfo" style="display:none;"><span>👤</span><span id="userNameDisplay"></span><button onclick="logout()" style="background:none;border:none;color:white;font-size:0.75rem;cursor:pointer;margin-left:5px;">退出</button></div>
+    </div>
+    <div class="slogan" id="slogan">今天也是闪闪发光的一天呢！</div>
+
+    <div class="page active" id="page-home">
+        <div class="stats-grid">
+            <div class="stat-card"><div class="stat-value" id="todayScore">0</div><div class="stat-label">今日得分</div></div>
+            <div class="stat-card"><div class="stat-value" id="streakDays">0</div><div class="stat-label">连续打卡</div></div>
+        </div>
+        <div class="card">
+            <div class="card-title"><span class="icon">🌙</span>作息打卡</div>
+            <div class="check-grid">
+                <button class="check-btn" id="btn-sleep" onclick="openCheckModal('sleep')"><span class="emoji">🌙</span><span class="label">睡觉打卡</span><span class="status" id="status-sleep">未打卡</span></button>
+                <button class="check-btn" id="btn-wake" onclick="openCheckModal('wake')"><span class="emoji">☀️</span><span class="label">起床打卡</span><span class="status" id="status-wake">未打卡</span></button>
+            </div>
+            <div style="margin-top:10px; font-size:0.8rem; color:var(--text-light);">💤 睡觉时间：20:00-01:00 | ☀️ 起床时间：05:00-11:00</div>
+        </div>
+        <div class="card">
+            <div class="card-title"><span class="icon">🍱</span>三餐打卡</div>
+            <div class="check-grid">
+                <button class="check-btn" id="btn-breakfast" onclick="openCheckModal('breakfast')"><span class="emoji">🥐</span><span class="label">早餐</span><span class="status" id="status-breakfast">未打卡</span></button>
+                <button class="check-btn" id="btn-lunch" onclick="openCheckModal('lunch')"><span class="emoji">🍜</span><span class="label">午餐</span><span class="status" id="status-lunch">未打卡</span></button>
+                <button class="check-btn" id="btn-dinner" onclick="openCheckModal('dinner')"><span class="emoji">🍲</span><span class="label">晚餐</span><span class="status" id="status-dinner">未打卡</span></button>
+                <button class="check-btn" id="btn-snack" onclick="openCheckModal('snack')"><span class="emoji">🍰</span><span class="label">加餐/水果</span><span class="status" id="status-snack">未打卡</span></button>
+            </div>
+            <div style="margin-top:10px; font-size:0.8rem; color:var(--text-light);">🕐 早餐：6:00-9:30 | 午餐：11:00-14:00 | 晚餐：17:00-20:30 | 加餐：随时</div>
+        </div>
+        <div class="card">
+            <div class="card-title"><span class="icon">🏃‍♀️</span>运动打卡</div>
+            <div class="check-grid">
+                <button class="check-btn" id="btn-sport1" onclick="openCheckModal('sport1')"><span class="emoji">🏃‍♀️</span><span class="label">运动打卡 1</span><span class="status" id="status-sport1">未打卡</span></button>
+                <button class="check-btn" id="btn-sport2" onclick="openCheckModal('sport2')"><span class="emoji">🧘‍♀️</span><span class="label">运动打卡 2</span><span class="status" id="status-sport2">未打卡</span></button>
+            </div>
+            <div style="margin-top:10px; font-size:0.8rem; color:var(--text-light);">每天至少1次，最多2次，每次需说明运动类型和时长</div>
+        </div>
+        <div class="card">
+            <div class="card-title"><span class="icon">🎨</span>其他活动</div>
+            <div class="check-grid">
+                <button class="check-btn" id="btn-other1" onclick="openCheckModal('other1')"><span class="emoji">📚</span><span class="label">其他活动 1</span><span class="status" id="status-other1">未打卡</span></button>
+                <button class="check-btn" id="btn-other2" onclick="openCheckModal('other2')"><span class="emoji">🎵</span><span class="label">其他活动 2</span><span class="status" id="status-other2">未打卡</span></button>
+            </div>
+            <div style="margin-top:10px; font-size:0.8rem; color:var(--text-light);">阅读、学习、绘画、音乐等，每天至少1次，最多2次</div>
+        </div>
+    </div>
+
+    <div class="page" id="page-progress">
+        <div class="card">
+            <div class="card-title"><span class="icon">🎁</span>成长奖励进度</div>
+            <div class="progress-container">
+                <div class="progress-item"><div class="progress-header"><span class="progress-title">🎀 第一套JK制服</span><span class="progress-reward">50分</span></div><div class="progress-bar-bg"><div class="progress-bar-fill" id="progress-50" style="width:0%"></div></div><div class="progress-text" id="text-50">0 / 50 分</div></div>
+                <div class="progress-item"><div class="progress-header"><span class="progress-title">🐻 熊之昭和蛋糕</span><span class="progress-reward">100分</span></div><div class="progress-bar-bg"><div class="progress-bar-fill" id="progress-100" style="width:0%"></div></div><div class="progress-text" id="text-100">0 / 100 分</div></div>
+                <div class="progress-item"><div class="progress-header"><span class="progress-title">👗 第二套JK制服</span><span class="progress-reward">150分</span></div><div class="progress-bar-bg"><div class="progress-bar-fill" id="progress-150" style="width:0%"></div></div><div class="progress-text" id="text-150">0 / 150 分</div></div>
+                <div class="progress-item"><div class="progress-header"><span class="progress-title">🍓 草莓空想曲</span><span class="progress-reward">250分</span></div><div class="progress-bar-bg"><div class="progress-bar-fill" id="progress-250" style="width:0%"></div></div><div class="progress-text" id="text-250">0 / 250 分</div></div>
+            </div>
+        </div>
+        <div class="card">
+            <div class="card-title"><span class="icon">📊</span>积分规则</div>
+            <div style="font-size:0.85rem; line-height:1.8; color:var(--text-light);">
+                <div>🌙 睡觉早于23:00 <span style="color:var(--success); font-weight:700;">+1分</span>，晚于23:00 <span style="color:var(--danger); font-weight:700;">-1分</span></div>
+                <div>☀️ 起床早于08:00 <span style="color:var(--success); font-weight:700;">+1分</span>，晚于08:00 <span style="color:var(--danger); font-weight:700;">-1分</span></div>
+                <div>🍱 每餐打卡 <span style="color:var(--success); font-weight:700;">+0.5分</span>，缺勤 <span style="color:var(--danger); font-weight:700;">-0.5分</span></div>
+                <div>🏃‍♀️ 运动/其他 每次 <span style="color:var(--success); font-weight:700;">+1分</span>，当日无 <span style="color:var(--danger); font-weight:700;">-0.5分</span></div>
+                <div style="margin-top:10px; padding:10px; background:rgba(255,179,198,0.1); border-radius:10px;">💡 首次使用不计算历史缺勤扣分，从今天开始记录哦！</div>
+            </div>
+        </div>
+    </div>
+
+    <div class="page" id="page-records">
+        <div class="card">
+            <div class="card-title"><span class="icon">📋</span>最近记录</div>
+            <div class="record-list" id="recordList">
+                <div class="empty-state"><div class="empty-icon">📝</div><div>还没有记录哦，快去打卡吧！</div></div>
+            </div>
+        </div>
+    </div>
+
+    <div class="page" id="page-profile">
+        <div class="card">
+            <div class="card-title"><span class="icon">📤</span>数据导出</div>
+            <div class="export-section">
+                <div style="font-size:0.85rem; color:var(--text-light); margin-bottom:15px;">导出最近两天的打卡记录，发送给哥哥审核</div>
+                <button class="export-btn" onclick="exportData()"><span>📦</span> 导出数据</button>
+                <button class="export-btn qr-btn" onclick="generateQR()"><span>📱</span> 生成二维码</button>
+                <div class="qr-display" id="qrDisplay">
+                    <div style="font-size:0.9rem; font-weight:700; margin-bottom:10px;">扫码获取数据</div>
+                    <div id="qrcode"></div>
+                    <div style="font-size:0.8rem; color:var(--text-light); margin-top:10px;">请哥哥使用管理端扫描</div>
+                </div>
+            </div>
+        </div>
+        <div class="card">
+            <div class="card-title"><span class="icon">💾</span>存储空间</div>
+            <div id="storageInfo" style="font-size:0.85rem; line-height:1.8; color:var(--text-light);">
+                <div style="display:flex; justify-content:space-between; padding:8px 0; border-bottom:1px solid rgba(255,179,198,0.1);"><span>已使用空间</span><span id="storageUsed" style="color:var(--primary); font-weight:700;">-</span></div>
+                <div style="display:flex; justify-content:space-between; padding:8px 0; border-bottom:1px solid rgba(255,179,198,0.1);"><span>剩余空间</span><span id="storageRemaining" style="color:var(--success); font-weight:700;">-</span></div>
+                <div style="display:flex; justify-content:space-between; padding:8px 0; border-bottom:1px solid rgba(255,179,198,0.1);"><span>记录数量</span><span id="storageRecords" style="color:var(--primary); font-weight:700;">-</span></div>
+                <div style="padding:8px 0;"><span>预计可再存</span><span id="storageEstimate" style="color:var(--accent); font-weight:700; float:right;">-</span></div>
+                <div id="storageProgressContainer" style="margin-top:10px; height:8px; background:#FFE5EC; border-radius:4px; overflow:hidden;">
+                    <div id="storageProgressBar" style="height:100%; width:0%; background:linear-gradient(90deg, var(--primary), var(--primary-light)); transition:width 0.3s;"></div>
+                </div>
+                <div id="storageWarning" style="margin-top:8px; padding:8px; background:rgba(255,173,173,0.1); border-radius:8px; font-size:0.75rem; color:var(--danger); display:none;">⚠️ 存储空间不足，请尽快导出数据备份！</div>
+            </div>
+        </div>
+        <div class="card">
+            <div class="card-title"><span class="icon">🔑</span>补分申请</div>
+            <div class="key-input-section">
+                <div style="font-size:0.85rem; color:var(--text-light);">向哥哥申请补分密钥，输入后可补充相应分数</div>
+                <div class="key-input">
+                    <input type="text" id="keyInput" placeholder="输入密钥" maxlength="8">
+                    <button onclick="submitKey()">确认</button>
+                </div>
+            </div>
+        </div>
+        <div class="card">
+            <div class="card-title"><span class="icon">📅</span>本月统计</div>
+            <div id="monthStats">
+                <div class="stats-grid">
+                    <div class="stat-card"><div class="stat-value" id="monthCheckins">0</div><div class="stat-label">本月打卡</div></div>
+                    <div class="stat-card"><div class="stat-value" id="monthScore">0</div><div class="stat-label">本月得分</div></div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal-overlay" id="checkModal">
+        <div class="modal-content">
+            <button class="modal-close" onclick="closeCheckModal()">✕</button>
+            <div class="modal-title" id="modalTitle">打卡</div>
+            <div id="modalBody">
+                <div class="form-group">
+                    <label class="form-label">📷 上传照片（必须）</label>
+                    <div class="photo-upload" id="photoUpload" onclick="handlePhotoUploadClick()">
+                        <div class="upload-icon">📷</div>
+                        <div class="upload-text">点击上传照片</div>
+                    </div>
+                    <input type="file" class="photo-input" id="photoInput" accept="image/*" onchange="handlePhotoSelect(event)" style="opacity:0;position:absolute;width:0;height:0;z-index:-1">
+                </div>
+                <div id="extraFields"></div>
+                <button class="submit-btn" id="submitBtn" onclick="submitCheck()">确认打卡</button>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal-overlay" id="detailModal">
+        <div class="modal-content">
+            <button class="modal-close" onclick="closeDetailModal()">✕</button>
+            <div id="detailContent"></div>
+        </div>
+    </div>
+        <div class="card">
+            <div class="card-title"><span class="icon">👤</span>账号管理</div>
+            <div style="text-align:center; padding:10px;">
+                <div style="font-size:1rem; font-weight:700; color:var(--primary); margin-bottom:8px;" id="profileUserName">-</div>
+                <div style="font-size:0.8rem; color:var(--text-light); margin-bottom:15px;">当前登录账号</div>
+                <button class="submit-btn" onclick="logout()" style="background:linear-gradient(135deg, #FFADAD 0%, #FFB3C6 100%);">退出登录</button>
+            </div>
+        </div>
+
+
+    <div class="nav-bar">
+        <button class="nav-item active" onclick="switchPage('home')"><span class="nav-icon">🏠</span><span class="nav-label">首页</span></button>
+        <button class="nav-item" onclick="switchPage('progress')"><span class="nav-icon">🎁</span><span class="nav-label">进度</span></button>
+        <button class="nav-item" onclick="switchPage('records')"><span class="nav-icon">📋</span><span class="nav-label">记录</span></button>
+        <button class="nav-item" onclick="switchPage('profile')"><span class="nav-icon">👤</span><span class="nav-label">我的</span></button>
+    </div>
+
+    <div class="toast" id="toast"></div>
+
+    <!-- CDN加载检测与备用方案 -->
+    <script>
+    window._cdnLoaded = { qrcode: false, supabase: false };
+    window._cdnErrors = [];
+    </script>
+
+    <!-- QRCode 主CDN + 备用 -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js" 
+        onload="window._cdnLoaded.qrcode=true;" 
+        onerror="var s=document.createElement('script');s.src='https://unpkg.com/qrcodejs@1.0.0/qrcode.min.js';s.onload=function(){window._cdnLoaded.qrcode=true;};document.head.appendChild(s);"></script>
+
+    <!-- Supabase 主CDN + 备用 -->
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js" 
+        onload="window._cdnLoaded.supabase=true;" 
+        onerror="var s=document.createElement('script');s.src='https://unpkg.com/@supabase/supabase-js@2/dist/umd/supabase.min.js';s.onload=function(){window._cdnLoaded.supabase=true;};document.head.appendChild(s);"></script>
+
+    <!-- 加载检测与超时提示 -->
+    <script>
+    (function(){
+        var maxWait = 15000; // 最多等15秒
+        var interval = 500;
+        var elapsed = 0;
+        var timer = setInterval(function(){
+            elapsed += interval;
+            if (window._cdnLoaded.qrcode && window._cdnLoaded.supabase) {
+                clearInterval(timer);
+                console.log('所有CDN加载成功');
+                return;
+            }
+            if (elapsed >= maxWait) {
+                clearInterval(timer);
+                var msg = '';
+                if (!window._cdnLoaded.supabase && !window._cdnLoaded.qrcode) {
+                    msg = '网络加载失败，请检查网络后刷新页面';
+                } else if (!window._cdnLoaded.supabase) {
+                    msg = '核心库加载失败，请刷新重试';
+                } else {
+                    msg = '部分资源加载失败，请刷新重试';
+                }
+                // 显示提示（如果DOM已就绪）
+                if (document.body) {
+                    var div = document.createElement('div');
+                    div.style.cssText = 'position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(255,255,255,0.95);z-index:99999;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:20px;text-align:center;';
+                    div.innerHTML = '<div style="font-size:48px;margin-bottom:20px;">⚠️</div><div style="font-size:18px;font-weight:700;color:#555;margin-bottom:12px;">加载遇到问题</div><div style="font-size:14px;color:#888;margin-bottom:24px;">' + msg + '</div><button onclick="location.reload()" style="padding:12px 24px;border:none;border-radius:12px;background:linear-gradient(135deg,#FF8FAB,#FFB3C6);color:white;font-size:15px;font-weight:600;">刷新页面</button>';
+                    document.body.appendChild(div);
+                }
+            }
+        }, interval);
+    })();
+    </script>
+
+<script>
+    const SUPABASE_URL = 'https://gxohqcnzkdgydjxcrbll.supabase.co';
+    const SUPABASE_KEY = 'sb_publishable_6F3IqV1R3sYuriTK3eiZlw_zbIrEXM3';
+    let supabaseClient = null;
+    let currentUser = null;
+
+    const slogans = [
+    // 通用元气
+    '今天也是闪闪发光的一天呢！✨',
+    '坚持打卡，遇见更好的自己！💪',
+    '琳琳最棒了，继续加油哦！🌸',
+    '早睡早起，元气满满！☀️',
+    '每一小步都是成长的印记！👣',
+    '今天的你比昨天更优秀！🌟',
+    '保持热爱，奔赴山海！🏔️',
+    '自律即自由，琳琳加油！🦋',
+    
+    // 早起唤醒
+    '早安呀，新的一天在等你！🌅',
+    '太阳都起床了，琳琳也不能赖床哦！🌞',
+    '早起的人儿有糖吃！🍬',
+    '清晨的第一缕阳光，送给最努力的琳琳！🌄',
+    '又是被梦想叫醒的一天！⏰',
+    '伸个懒腰，迎接美好早晨！🐱',
+    
+    // 睡觉晚安
+    '月亮说晚安，琳琳要乖乖睡觉啦！🌙',
+    '早点休息，明天才能元气满满！💤',
+    '关掉手机，让星星陪你入睡！⭐',
+    '睡个好觉，梦里都是甜甜的事！🍭',
+    '今天的努力到此结束，晚安小天使！😴',
+    
+    // 运动活力
+    '动起来，让身体充满能量！🏃‍♀️',
+    '汗水是脂肪在哭泣，琳琳最棒！💦',
+    '运动后的多巴胺，是最甜的奖励！🎯',
+    '每一步都在靠近更好的自己！👟',
+    '身体在发光，因为你正在燃烧！🔥',
+    
+    // 三餐饮食
+    '好好吃饭，才有力气变优秀！🍱',
+    '早餐要吃好，一天没烦恼！🥐',
+    '午餐时间到，补充能量继续冲！🍜',
+    '晚餐吃得香，梦里都是甜的！🍲',
+    '健康饮食，是爱自己最好的方式！🥗',
+    
+    // 学习成长
+    '翻开书本，就是打开新世界！📚',
+    '学习的样子，是琳琳最美的样子！🎓',
+    '今天的知识点，又get了一个！💡',
+    '脑袋里的知识，谁也偷不走！🧠',
+    '阅读一小时，成长一大步！📖',
+    
+    // 绘画音乐手工
+    '画笔下的世界，由你创造！🎨',
+    '音乐响起，心情也跟着起舞！🎵',
+    '手工的温度，是时间的礼物！✂️',
+    '创作的时候，琳琳在发光！🖌️',
+    '每一笔都是独一无二的风景！🌈',
+    
+    // 坚持自律
+    '再坚持一下，你就赢了昨天的自己！🏆',
+    '打卡不是任务，是爱的约定！💖',
+    '慢一点没关系，只要不停下来！🐢',
+    '习惯的力量，会带你到想去的地方！🚀',
+    '今天的坚持，是明天惊喜的铺垫！🎁',
+    
+    // 温馨鼓励
+    '主人一直在看着你哦，要乖！👀',
+    '琳琳的努力，每一秒都被看见！👁️',
+    '累了就歇歇，但别放弃哦！🫂',
+    '你是独一无二的小星星！🌟',
+    '不管今天怎样，你都是最棒的！💕',
+    
+    // 目标奖励
+    '离JK制服又近了一步！🎀',
+    '积分在涨，快乐也在涨！📈',
+    '奖励正在向你招手！🎁',
+    '攒够分数，就可以把蛋糕带回家！🍰',
+    '草莓空想曲在终点等你！🍓'
+];
+    const checkConfig = {
+        sleep: { name: '睡觉打卡', emoji: '🌙', timeCheck: () => { const h = new Date().getHours(); return h >= 20 || h < 1; }, fields: [] },
+        wake: { name: '起床打卡', emoji: '☀️', timeCheck: () => { const h = new Date().getHours(); return h >= 5 && h < 11; }, fields: [] },
+        breakfast: { name: '早餐打卡', emoji: '🥐', timeCheck: () => { const n = new Date(); const h = n.getHours() + n.getMinutes() / 60; return h >= 6 && h < 9.5; }, fields: [] },
+        lunch: { name: '午餐打卡', emoji: '🍜', timeCheck: () => { const n = new Date(); const h = n.getHours() + n.getMinutes() / 60; return h >= 11 && h < 14; }, fields: [] },
+        dinner: { name: '晚餐打卡', emoji: '🍲', timeCheck: () => { const n = new Date(); const h = n.getHours() + n.getMinutes() / 60; return h >= 17 && h < 20.5; }, fields: [] },
+        snack: { name: '加餐打卡', emoji: '🍰', timeCheck: () => true, fields: [] },
+        sport1: { name: '运动打卡 1', emoji: '🏃‍♀️', timeCheck: () => true, fields: [{ label: '🏃‍♀️ 运动类型', type: 'select', options: ['跑步', '放松操', '卷腹', '健身', '散步', '深蹲', '球类运动', '其他'], id: 'sportType' }, { label: '⏱️ 运动时长（分钟）', type: 'number', id: 'sportDuration', placeholder: '例如：30' }] },
+            sport2: { name: '运动打卡 2', emoji: '🧘‍♀️', timeCheck: () => true, fields: [{ label: '🏃‍♀️ 运动类型', type: 'select', options: ['跑步', '放松操', '卷腹', '健身', '散步', '深蹲', '球类运动', '其他'], id: 'sportType2' }, { label: '⏱️ 运动时长（分钟）', type: 'number', id: 'sportDuration2', placeholder: '例如：30' }] },
+            other1: { name: '其他活动 1', emoji: '📚', timeCheck: () => true, fields: [{ label: '🎨 活动类型', type: 'select', options: ['阅读', '作业', '看剧', '音乐', '卖萌', '游戏', '其他'], id: 'otherType' }, { label: '📝 活动描述', type: 'textarea', id: 'otherDesc', placeholder: '简单描述一下今天的活动...' }] },
+            other2: { name: '其他活动 2', emoji: '🎵', timeCheck: () => true, fields: [{ label: '🎨 活动类型', type: 'select', options: ['阅读', '作业', '看剧', '音乐', '卖萌', '游戏', '其他'], id: 'otherType2' }, { label: '📝 活动描述', type: 'textarea', id: 'otherDesc2', placeholder: '简单描述一下今天的活动...' }] }
+        };
+
+    const DB = {
+        db: null, dbName: 'LinLinDB', storeName: 'photos', version: 1,
+        async init() { return new Promise((resolve) => { if (!window.indexedDB) { console.warn("IDB not supported"); resolve(); return; } try { const request = indexedDB.open(this.dbName, this.version); request.onerror = () => { console.warn("IDB open failed"); resolve(); }; request.onsuccess = (event) => { this.db = event.target.result; resolve(); }; request.onupgradeneeded = (event) => { const db = event.target.result; if (!db.objectStoreNames.contains(this.storeName)) db.createObjectStore(this.storeName, { keyPath: "id" }); }; } catch(e) { console.warn("IDB init error:", e); resolve(); } }); },
+        async savePhoto(id, photoData) { if (!this.db) await this.init(); if (!this.db) return true; return new Promise((resolve) => { try { const transaction = this.db.transaction([this.storeName], 'readwrite'); const store = transaction.objectStore(this.storeName); const request = store.put({ id: id, photo: photoData, time: new Date().toISOString() }); request.onsuccess = () => resolve(true); request.onerror = () => resolve(false); } catch(e) { resolve(false); } }); },
+        async getPhoto(id) { if (!this.db) await this.init(); if (!this.db) return null; return new Promise((resolve) => { try { const transaction = this.db.transaction([this.storeName], 'readonly'); const store = transaction.objectStore(this.storeName); const request = store.get(id); request.onsuccess = () => resolve(request.result ? request.result.photo : null); request.onerror = () => resolve(null); } catch(e) { resolve(null); } }); },
+        async deletePhoto(id) { if (!this.db) await this.init(); if (!this.db) return true; return new Promise((resolve) => { try { const transaction = this.db.transaction([this.storeName], 'readwrite'); const store = transaction.objectStore(this.storeName); const request = store.delete(id); request.onsuccess = () => resolve(true); request.onerror = () => resolve(false); } catch(e) { resolve(false); } }); },
+        async clearAll() { if (!this.db) await this.init(); if (!this.db) return true; return new Promise((resolve) => { try { const transaction = this.db.transaction([this.storeName], 'readwrite'); const store = transaction.objectStore(this.storeName); const request = store.clear(); request.onsuccess = () => resolve(true); request.onerror = () => resolve(false); } catch(e) { resolve(false); } }); }
+    };
+
+    const Storage = {
+        _prefix: '',
+        setPrefix(userId) { this._prefix = userId ? 'u_' + userId + '_' : ''; },
+        _key(k) { return this._prefix + k; },
+        get(key) { try { const d = localStorage.getItem(this._key(key)); return d ? JSON.parse(d) : null; } catch(e) { return null; } },
+        set(key, value) { try { localStorage.setItem(this._key(key), JSON.stringify(value)); return true; } catch(e) { console.error('Storage error:', e); return false; } },
+        remove(key) { try { localStorage.removeItem(this._key(key)); return true; } catch(e) { return false; } },
+        init() { if (!this.get('initialized')) { this.set('initialized', true); this.set('firstUseDate', new Date().toISOString().split('T')[0]); this.set('records', []); this.set('totalScore', 0); this.set('todayScore', 0); this.set('todayChecks', {}); this.set('lastCheckDate', ''); this.set('streakDays', 0); this.set('validKeys', {}); } },
+        getSize() { let total = 0; for (let key in localStorage) { if (localStorage.hasOwnProperty(key) && key.startsWith(this._prefix)) total += localStorage[key].length * 2; } return total; },
+        getSizeInfo() { const localUsed = this.getSize(); const records = this.get('records') || []; let dbUsed = 0; if (records.length > 0) dbUsed = records.length * 150 * 1024; const totalUsed = localUsed + dbUsed; const localLimit = 5 * 1024 * 1024; const dbLimit = 50 * 1024 * 1024; const totalLimit = localLimit + dbLimit; const localRemaining = Math.max(0, localLimit - localUsed); const dbRemaining = Math.max(0, dbLimit - dbUsed); const totalRemaining = localRemaining + dbRemaining; const avgRecordSize = records.length > 0 ? totalUsed / records.length : 200 * 1024; const estimatedRecords = Math.floor(totalRemaining / avgRecordSize); return { used: localUsed, dbUsed: dbUsed, totalUsed: totalUsed, limit: localLimit, dbLimit: dbLimit, totalLimit: totalLimit, remaining: localRemaining, dbRemaining: dbRemaining, totalRemaining: totalRemaining, usedPercent: Math.min(100, (localUsed / localLimit * 100).toFixed(1)), totalUsedPercent: Math.min(100, (totalUsed / totalLimit * 100).toFixed(1)), recordCount: records.length, avgRecordSize: avgRecordSize, estimatedRecords: estimatedRecords }; }
+    };
+
+    const Store = {
+        ready: false,
+        async init() {
+            // 等待CDN加载完成（最多额外等3秒）
+            var waitStart = Date.now();
+            while ((typeof supabase === 'undefined' || typeof QRCode === 'undefined') && Date.now() - waitStart < 3000) {
+                await new Promise(r => setTimeout(r, 200));
+            }
+            if (typeof supabase !== 'undefined') {
+                try { supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_KEY); this.ready = true; console.log('Supabase connected'); }
+                catch(e) { console.error('Supabase init failed:', e); }
+            }
+            if (!this.ready) console.warn('Using localStorage fallback');
+            Storage.init();
+            try { await DB.init(); } catch(e) { console.error('IndexedDB init failed:', e); }
+        },
+        async getRecords() {
+            if (this.ready) { try { const { data, error } = await supabaseClient.from('records').select('*').eq('user_id', currentUser?.id || 'linlin').order('time', { ascending: false }); if (!error && data) { Storage.set('records', data); return data; } } catch(e) { console.error('Supabase getRecords error:', e); } }
+            return Storage.get('records') || [];
+        },
+        async insertRecord(record) {
+            const localRecords = Storage.get('records') || []; localRecords.unshift(record); Storage.set('records', localRecords);
+            if (this.ready) { 
+                try { 
+                    const dbRecord = { id: record.id, user_id: (currentUser?.id || 'linlin'), type: record.type, type_name: record.typeName, emoji: record.emoji, score: record.score, date: record.date, time: record.time, extra_data: record.extraData || null, photo_url: record.photo_url || null, photo_id: record.photoId || null }; 
+                    const { error } = await supabaseClient.from('records').insert(dbRecord); 
+                    if (error) { console.error('Supabase insert error:', error); showToast('云端保存失败：' + error.message, 'error'); return false; }
+                } catch(e) { console.error('Supabase insert error:', e); showToast('云端保存失败，请检查网络', 'error'); return false; } 
+            }
+            return true;
+        },
+        async uploadPhoto(id, base64Data) {
+            if (this.ready) { try { const res = await fetch(base64Data); const blob = await res.blob(); const path = (currentUser?.id || 'linlin') + '/' + id + '.jpg'; const { data, error } = await supabaseClient.storage.from('photos').upload(path, blob, { contentType: 'image/jpeg', upsert: true }); if (!error && data) { const { data: urlData } = supabaseClient.storage.from('photos').getPublicUrl(path); return urlData.publicUrl; } } catch(e) { console.error('Upload error:', e); } }
+            try { await DB.savePhoto(id, base64Data); } catch(e) {}
+            return null;
+        },
+        async getPhoto(record) {
+            if (record.photo_url) return record.photo_url;
+            const pid = record.photo_id || record.photoId; if (pid) { try { return await DB.getPhoto(pid); } catch(e) {} }
+            if (record.photo) return record.photo; return null;
+        },
+        async getValidKey(key) {
+            if (this.ready) { try { const { data, error } = await supabaseClient.from('keys').select('*').eq('key', key).eq('used', false).single(); if (!error && data) return data; } catch(e) {} }
+            const validKeys = Storage.get('validKeys') || {}; const cached = validKeys[key]; if (!cached) return null; if (typeof cached === 'number') return { key, score: cached, used: false }; if (cached && !cached.used) return { key, score: cached.score, used: false }; return null;
+        },
+        async markKeyUsed(key) {
+            const validKeys = Storage.get('validKeys') || {};
+            validKeys[key] = { score: validKeys[key] ? validKeys[key].score : validKeys[key], used: true };
+            Storage.set('validKeys', validKeys);
+            if (this.ready) { try { await supabaseClient.from('keys').update({ used: true, used_by: (currentUser?.id || 'linlin') }).eq('key', key); } catch(e) {} }
+        }
+    };
+
+
+    const Auth = {
+        async login(username, password) {
+            if (!Store.ready) { showToast('网络未就绪，请刷新重试', 'error'); return null; }
+            try {
+                const { data, error } = await supabaseClient.from('users').select('*').eq('username', username).eq('password', password).single();
+                if (error || !data) { showToast('账号或密码错误', 'error'); return null; }
+                currentUser = data;
+                localStorage.setItem('linlin_user', JSON.stringify(data));
+                Storage.setPrefix(data.id);
+                Storage.init();
+                return data;
+            } catch(e) { console.error('Login error:', e); showToast('登录失败', 'error'); return null; }
+        },
+        async register(username, password) {
+            if (!Store.ready) { showToast('网络未就绪，请刷新重试', 'error'); return null; }
+            try {
+                const { data: existing } = await supabaseClient.from('users').select('id').eq('username', username).single();
+                if (existing) { showToast('该账号已存在', 'error'); return null; }
+            } catch(e) {}
+            try {
+                const { data, error } = await supabaseClient.from('users').insert({ username: username, password: password, role: 'user' }).select().single();
+                if (error) { showToast('注册失败：' + error.message, 'error'); return null; }
+                currentUser = data;
+                localStorage.setItem('linlin_user', JSON.stringify(data));
+                Storage.setPrefix(data.id);
+                Storage.init();
+                return data;
+            } catch(e) { console.error('Register error:', e); showToast('注册失败', 'error'); return null; }
+        },
+        logout() {
+            currentUser = null;
+            Storage.setPrefix('');
+            localStorage.removeItem('linlin_user');
+            document.getElementById('loginPage').classList.remove('hidden');
+            document.getElementById('userInfo').style.display = 'none';
+            showToast('已退出登录', 'success');
+        },
+        checkLogin() {
+            const saved = localStorage.getItem('linlin_user');
+            if (saved) { try { currentUser = JSON.parse(saved); Storage.setPrefix(currentUser.id); return true; } catch(e) { return false; } }
+            return false;
+        }
+    };
+
+    function switchLoginTab(tab) {
+        document.getElementById('tab-login').classList.toggle('active', tab === 'login');
+        document.getElementById('tab-register').classList.toggle('active', tab === 'register');
+        document.getElementById('loginForm').style.display = tab === 'login' ? 'block' : 'none';
+        document.getElementById('registerForm').style.display = tab === 'register' ? 'block' : 'none';
+    }
+
+    async function doLogin() {
+        const btn = document.querySelector('#loginForm .login-btn');
+        const originalText = btn ? btn.textContent : '登录';
+        try {
+            const username = document.getElementById('loginUsername').value.trim();
+            const password = document.getElementById('loginPassword').value.trim();
+            if (!username || !password) { showToast('请填写账号和密码', 'error'); return; }
+            if (!Store.ready) { showToast('网络未就绪，Supabase 连接失败，请刷新重试', 'error'); return; }
+            if (btn) { btn.classList.add('loading'); btn.textContent = '正在登录...'; btn.disabled = true; }
+            const user = await Auth.login(username, password);
+            if (btn) { btn.classList.remove('loading'); btn.textContent = originalText; btn.disabled = false; }
+            if (user) {
+                const remember = document.getElementById('rememberMe');
+                if (remember && remember.checked) {
+                    localStorage.setItem('linlin_remember', JSON.stringify({ username: username, password: password }));
+                } else {
+                    localStorage.removeItem('linlin_remember');
+                }
+                enterApp(); showToast('欢迎回来，' + user.username + '！', 'success');
+            }
+        } catch(err) {
+            if (btn) { btn.classList.remove('loading'); btn.textContent = originalText; btn.disabled = false; }
+            console.error('Login error:', err);
+            showToast('登录出错：' + (err.message || '请检查网络'), 'error');
+        }
+    }
+
+    async function doRegister() {
+        const btn = document.querySelector('#registerForm .login-btn');
+        const originalText = btn ? btn.textContent : '注册账号';
+        try {
+            const username = document.getElementById('regUsername').value.trim();
+            const password = document.getElementById('regPassword').value.trim();
+            const password2 = document.getElementById('regPassword2').value.trim();
+            if (!username || !password) { showToast('请填写完整信息', 'error'); return; }
+            if (password !== password2) { showToast('两次密码不一致', 'error'); return; }
+            if (username.length < 2 || username.length > 20) { showToast('账号长度2-20位', 'error'); return; }
+            if (password.length < 4) { showToast('密码至少4位', 'error'); return; }
+            if (!Store.ready) { showToast('网络未就绪，Supabase 连接失败，请刷新重试', 'error'); return; }
+            if (btn) { btn.classList.add('loading'); btn.textContent = '正在注册...'; btn.disabled = true; }
+            const user = await Auth.register(username, password);
+            if (btn) { btn.classList.remove('loading'); btn.textContent = originalText; btn.disabled = false; }
+            if (user) { enterApp(); showToast('注册成功！欢迎，' + user.username + '！', 'success'); }
+        } catch(err) {
+            if (btn) { btn.classList.remove('loading'); btn.textContent = originalText; btn.disabled = false; }
+            console.error('Register error:', err);
+            showToast('注册出错：' + (err.message || '请检查网络'), 'error');
+        }
+    }
+
+    function logout() { Auth.logout(); }
+
+    function enterApp() {
+        if (currentUser) Storage.setPrefix(currentUser.id);
+        document.getElementById('loginPage').classList.add('hidden');
+        const userInfo = document.getElementById('userInfo');
+        const userNameDisplay = document.getElementById('userNameDisplay');
+        const profileUserName = document.getElementById('profileUserName');
+        if (userInfo) userInfo.style.display = 'inline-flex';
+        if (userNameDisplay) userNameDisplay.textContent = currentUser?.username || '-';
+        if (profileUserName) profileUserName.textContent = currentUser?.username || '-';
+        checkNewDay(); recalculateAllScores(); updateUI();
+    }
+
+    function showToast(msg, type) { const t = document.getElementById('toast'); if (!t) return; t.textContent = msg; t.className = 'toast ' + type; setTimeout(() => t.classList.add('show'), 10); setTimeout(() => t.classList.remove('show'), 2500); }
+    function getToday() { return new Date().toISOString().split('T')[0]; }
+    function getNowHour() { return new Date().getHours(); }
+    function calculateRecordScore(type) { const h = getNowHour(); switch(type) { case 'sleep': return h < 23 ? 1 : -1; case 'wake': return h < 8 ? 1 : -1; case 'breakfast': case 'lunch': case 'dinner': case 'snack': return 0.5; case 'sport1': case 'sport2': case 'other1': case 'other2': return 1; default: return 0; } }
+
+    async function recalculateAllScores() {
+        const records = await Store.getRecords(); const firstUseDate = Storage.get('firstUseDate'); const today = getToday(); let totalScore = 0; let todayScore = 0; let todayScore = 0;
+        const dailyRecords = {}; records.forEach(r => { if (!dailyRecords[r.date]) dailyRecords[r.date] = []; dailyRecords[r.date].push(r); });
+        Object.keys(dailyRecords).sort().forEach(date => {
+            if (date < firstUseDate) return; const dayRecords = dailyRecords[date]; let dayScore = 0;
+            const bonusRecords = dayRecords.filter(r => r.type === 'bonus'); bonusRecords.forEach(r => dayScore += (r.score || 0));
+            const regularRecords = dayRecords.filter(r => r.type !== 'bonus');
+            const sleep = regularRecords.find(r => r.type === 'sleep'); const wake = regularRecords.find(r => r.type === 'wake');
+            if (sleep) dayScore += (sleep.score || 0); if (wake) dayScore += (wake.score || 0);
+            ['breakfast', 'lunch', 'dinner'].forEach(meal => { const mealRecord = regularRecords.find(r => r.type === meal); if (mealRecord) dayScore += 0.5; else if (date !== today) dayScore -= 0.5; });
+            const snack = regularRecords.find(r => r.type === 'snack'); if (snack) dayScore += 0.5;
+            const sports = regularRecords.filter(r => r.type === 'sport1' || r.type === 'sport2'); if (sports.length > 0) dayScore += Math.min(sports.length, 2) * 1; else if (date !== today) dayScore -= 0.5;
+            const others = regularRecords.filter(r => r.type === 'other1' || r.type === 'other2'); if (others.length > 0) dayScore += Math.min(others.length, 2) * 1; else if (date !== today) dayScore -= 0.5;
+            totalScore += dayScore; if (date === today) todayScore = dayScore;
+        });
+        Storage.set('totalScore', totalScore); Storage.set('todayScore', todayScore); return { totalScore, todayScore };
+    }
+
+    let currentCheckType = ''; let selectedPhoto = null;
+
+    document.addEventListener('DOMContentLoaded', async () => {
+        await Store.init(); initFloatingHearts(); rotateSlogan();
+        const remembered = localStorage.getItem('linlin_remember');
+        if (remembered && !Auth.checkLogin()) {
+            try {
+                const r = JSON.parse(remembered);
+                const un = document.getElementById('loginUsername');
+                const pw = document.getElementById('loginPassword');
+                const rm = document.getElementById('rememberMe');
+                if (un) un.value = r.username || '';
+                if (pw) pw.value = r.password || '';
+                if (rm) rm.checked = true;
+            } catch(e) {}
+        }
+        if (Auth.checkLogin()) { enterApp(); } else { document.getElementById('loginPage').classList.remove('hidden'); }
+        await checkNewDay(); await recalculateAllScores(); await updateUI();
+        window.addEventListener('pageshow', (e) => {
+            if (e.persisted && Auth.checkLogin()) { enterApp(); }
+        });
+        setInterval(async () => { await checkNewDay(); }, 60000);
+        document.querySelectorAll('.modal-overlay').forEach(m => { m.addEventListener('click', (e) => { if (e.target === m) m.classList.remove('active'); }); });
+    });
+
+    function initFloatingHearts() { const c = document.getElementById('hearts'); if (!c) return; const hearts = ['🌸','✨','💕','🌷','⭐','🦋','🌙','☁️']; for (let i = 0; i < 5; i++) { const s = document.createElement('span'); s.textContent = hearts[Math.floor(Math.random() * hearts.length)]; s.style.left = Math.random() * 100 + '%'; s.style.animationDelay = Math.random() * 15 + 's'; s.style.animationDuration = (10 + Math.random() * 10) + 's'; c.appendChild(s); } }
+    function rotateSlogan() { const s = document.getElementById('slogan'); if (!s) return; s.textContent = slogans[Math.floor(Math.random() * slogans.length)]; setInterval(() => { s.style.opacity = '0'; setTimeout(() => { s.textContent = slogans[Math.floor(Math.random() * slogans.length)]; s.style.opacity = '1'; }, 300); }, 10000); }
+
+    async function checkNewDay() {
+        const lastDate = Storage.get('lastCheckDate') || ''; const today = getToday();
+        if (lastDate !== today) {
+            Storage.set('lastCheckDate', today);
+        }
+        const records = await Store.getRecords(); const todayChecks = {};
+        records.filter(r => r.date === today && r.type !== 'bonus').forEach(r => { todayChecks[r.type] = true; });
+        Storage.set('todayChecks', todayChecks);
+        // 基于实际打卡记录计算连续天数
+        const streak = calculateStreak(records);
+        Storage.set('streakDays', streak);
+    }
+
+    function calculateStreak(records) {
+        records = records || [];
+        const checkDates = [...new Set(records.filter(r => r.type !== 'bonus').map(r => r.date))].sort();
+        if (checkDates.length === 0) return 0;
+        const today = getToday();
+        let startDate = new Date(today + 'T00:00:00');
+        // 如果今天没打卡，从昨天开始检查
+        if (!checkDates.includes(today)) {
+            startDate.setDate(startDate.getDate() - 1);
+        }
+        let streak = 0;
+        let checkDate = new Date(startDate);
+        while (true) {
+            const dateStr = checkDate.toISOString().split('T')[0];
+            if (checkDates.includes(dateStr)) {
+                streak++;
+                checkDate.setDate(checkDate.getDate() - 1);
+            } else {
+                break;
+            }
+        }
+        return streak;
+    }
+
+    function switchPage(page) { document.querySelectorAll('.page').forEach(p => p.classList.remove('active')); document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active')); document.getElementById('page-' + page).classList.add('active'); event.target.closest('.nav-item').classList.add('active'); if (page === 'records') loadRecords(); if (page === 'progress') updateProgress(); if (page === 'profile') await updateProfile(); }
+
+    async function updateUI() {
+        const todayChecks = Storage.get('todayChecks') || {};
+        const records = await Store.getRecords();
+        const { totalScore, todayScore } = await recalculateAllScores();
+        const streak = calculateStreak(records);
+        const totalEl = document.getElementById('totalScore'); const todayEl = document.getElementById('todayScore'); const streakEl = document.getElementById('streakDays');
+        if (totalEl) totalEl.textContent = totalScore.toFixed(1); if (todayEl) todayEl.textContent = todayScore.toFixed(1); if (streakEl) streakEl.textContent = streak;
+        Object.keys(checkConfig).forEach(type => { const btn = document.getElementById('btn-' + type); const status = document.getElementById('status-' + type); if (btn && status) { if (todayChecks[type]) { btn.classList.add('completed'); status.textContent = '已打卡 ✓'; } else { btn.classList.remove('completed'); status.textContent = '未打卡'; } } });
+        updateProgress();
+    }
+
+    function updateProgress() { const totalScore = Storage.get('totalScore') || 0; [50, 100, 150, 250].forEach(target => { const bar = document.getElementById('progress-' + target); const text = document.getElementById('text-' + target); if (!bar || !text) return; const progress = Math.min((totalScore / target) * 100, 100); bar.style.width = progress + '%'; text.textContent = totalScore.toFixed(1) + ' / ' + target + ' 分'; const item = bar.closest('.progress-item'); if (item) { if (totalScore >= target) { item.classList.remove('progress-locked'); const title = item.querySelector('.progress-title'); if (title && !title.querySelector('.unlocked-badge')) title.innerHTML += '<span class="unlocked-badge">已解锁</span>'; } else { item.classList.add('progress-locked'); } } }); }
+
+    function compressImage(base64Image, maxWidth, maxHeight, quality) {
+        return new Promise((resolve, reject) => {
+            const img = new Image();
+            img.onload = () => { try { let width = img.width; let height = img.height; if (width > maxWidth || height > maxHeight) { const ratio = Math.min(maxWidth / width, maxHeight / height); width = Math.floor(width * ratio); height = Math.floor(height * ratio); } const canvas = document.createElement('canvas'); canvas.width = width; canvas.height = height; const ctx = canvas.getContext('2d'); ctx.fillStyle = '#FFFFFF'; ctx.fillRect(0, 0, width, height); ctx.drawImage(img, 0, 0, width, height); let compressed; try { compressed = canvas.toDataURL('image/jpeg', quality); } catch(e) { compressed = canvas.toDataURL('image/png'); } if (compressed.length > 500000 && quality > 0.3) { const newQuality = Math.max(0.3, quality - 0.2); try { compressed = canvas.toDataURL('image/jpeg', newQuality); } catch(e) {} } resolve(compressed); } catch(err) { reject(err); } };
+            img.onerror = () => reject(new Error('图片加载失败')); img.crossOrigin = 'anonymous'; img.src = base64Image;
+        });
+    }
+
+    function openCheckModal(type) { const config = checkConfig[type]; const todayChecks = Storage.get('todayChecks') || {}; if (todayChecks[type]) { showToast('今天已经打过卡啦！', 'error'); return; } if (!config.timeCheck()) { showToast('不在打卡时间范围内哦！', 'error'); return; } currentCheckType = type; selectedPhoto = null; const modalTitle = document.getElementById('modalTitle'); const photoUpload = document.getElementById('photoUpload'); const photoInput = document.getElementById('photoInput'); const extraFields = document.getElementById('extraFields'); if (modalTitle) modalTitle.textContent = config.name + ' ' + config.emoji; if (photoUpload) { photoUpload.classList.remove('has-image'); photoUpload.innerHTML = '<div class="upload-icon">📷</div><div class="upload-text">点击上传照片</div>'; } if (photoInput) photoInput.value = ''; if (extraFields) { extraFields.innerHTML = ''; if (config.fields) { config.fields.forEach(field => { const div = document.createElement('div'); div.className = 'form-group'; let inputHtml = ''; if (field.type === 'select') { inputHtml = '<select class="form-select" id="' + field.id + '"><option value="">请选择</option>' + field.options.map(o => '<option value="' + o + '">' + o + '</option>').join('') + '</select>'; } else if (field.type === 'textarea') { inputHtml = '<textarea class="form-textarea" id="' + field.id + '" placeholder="' + field.placeholder + '"></textarea>'; } else { inputHtml = '<input type="' + field.type + '" class="form-input" id="' + field.id + '" placeholder="' + field.placeholder + '">'; } div.innerHTML = '<label class="form-label">' + field.label + '</label>' + inputHtml; extraFields.appendChild(div); }); } } document.getElementById('checkModal').classList.add('active'); }
+
+    function closeCheckModal() { document.getElementById('checkModal').classList.remove('active'); currentCheckType = ''; selectedPhoto = null; }
+
+    function handlePhotoUploadClick() { var input = document.getElementById('photoInput'); if (input) { input.click(); } }
+        function handlePhotoSelect(event) { const file = event.target.files[0]; if (!file) return; if (!file.type.startsWith('image/')) { showToast('请选择图片文件哦！', 'error'); event.target.value = ''; return; } const upload = document.getElementById('photoUpload'); if (upload) upload.innerHTML = '<div class="upload-icon">⏳</div><div class="upload-text">正在读取图片...</div>'; const reader = new FileReader(); reader.onload = (e) => { selectedPhoto = e.target.result; if (upload) { upload.classList.add('has-image'); upload.innerHTML = '<img src="' + selectedPhoto + '" alt="预览">'; } const sizeMB = (selectedPhoto.length / 1024 / 1024).toFixed(1); if (sizeMB > 1) showToast('图片较大，提交时会自动压缩', 'success'); }; reader.onerror = () => { showToast('图片读取失败，请重试', 'error'); event.target.value = ''; if (upload) { upload.classList.remove('has-image'); upload.innerHTML = '<div class="upload-icon">📷</div><div class="upload-text">点击上传照片</div>'; } }; reader.readAsDataURL(file); }
+
+    async function submitCheck() {
+        if (!selectedPhoto) { showToast('请上传照片哦！', 'error'); return; }
+        const todayChecks = Storage.get('todayChecks') || {}; if (todayChecks[currentCheckType]) { showToast('今天已经打过卡啦！', 'error'); closeCheckModal(); return; }
+        let compressedPhoto = selectedPhoto; const originalSize = selectedPhoto.length;
+        if (originalSize > 200000) { try { showToast('正在优化图片...', 'success'); let maxSize = 800, quality = 0.6; if (originalSize > 2000000) { maxSize = 600; quality = 0.4; } else if (originalSize > 1000000) { maxSize = 700; quality = 0.5; } compressedPhoto = await compressImage(selectedPhoto, maxSize, maxSize, quality); if (compressedPhoto.length > 300000) compressedPhoto = await compressImage(selectedPhoto, 500, 500, 0.3); } catch(e) { console.error('压缩失败:', e); if (originalSize > 1000000) { showToast('图片处理失败，请尝试选择较小的图片', 'error'); return; } } }
+        const config = checkConfig[currentCheckType]; const extraData = {};
+        if (config.fields) { for (let field of config.fields) { const el = document.getElementById(field.id); if (!el) { showToast('页面元素异常，请刷新重试', 'error'); return; } const val = el.value.trim(); if (!val) { showToast('请填写完整信息！', 'error'); return; } extraData[field.id] = val; } }
+        const now = new Date(); const recordId = now.getTime();
+        showToast('正在同步数据...', 'success');
+        const photoUrl = await Store.uploadPhoto(recordId, compressedPhoto);
+        const record = { id: recordId, type: currentCheckType, typeName: config.name, emoji: config.emoji, time: now.toISOString(), photoId: photoUrl ? null : recordId, photo_url: photoUrl, extraData: extraData, score: calculateRecordScore(currentCheckType), date: getToday() };
+        const success = await Store.insertRecord(record); if (!success) { showToast('本地已保存，但云端同步失败，请检查网络或联系管理员', 'error'); }
+        todayChecks[currentCheckType] = true; Storage.set('todayChecks', todayChecks);
+        await recalculateAllScores(); await updateUI(); showToast('打卡成功！+' + record.score + '分 🎉', 'success'); closeCheckModal();
+    }
+
+    async function loadRecords() {
+        const records = await Store.getRecords(); const list = document.getElementById('recordList'); if (!list) return;
+        if (records.length === 0) { list.innerHTML = '<div class="empty-state"><div class="empty-icon">📝</div><div>还没有记录哦，快去打卡吧！</div></div>'; return; }
+        list.innerHTML = records.slice(0, 50).map(r => { const date = new Date(r.time); const timeStr = isNaN(date.getTime()) ? '未知时间' : date.toLocaleString('zh-CN', { month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' }); const scoreClass = (r.score || 0) >= 0 ? 'score-positive' : 'score-negative'; const scoreText = (r.score || 0) >= 0 ? '+' + (r.score || 0) : (r.score || 0); const emoji = r.emoji || '❓'; const typeName = r.type_name || r.typeName || '未知类型'; const bgColor = r.type === 'bonus' ? '#FFD6A5' : getTypeColor(r.type); return '<div class="record-item" onclick="showRecordDetail(' + r.id + ')"><div class="record-icon" style="background: ' + bgColor + '">' + emoji + '</div><div class="record-content"><div class="record-title">' + typeName + '</div><div class="record-time">' + timeStr + '</div></div><div class="record-score ' + scoreClass + '">' + scoreText + '分</div></div>'; }).join('');
+    }
+
+    function getTypeColor(type) { const colors = { sleep: '#CDB4DB', wake: '#FFD6A5', breakfast: '#FFADAD', lunch: '#FDFFB6', dinner: '#CAFFBF', snack: '#9BF6FF', sport1: '#A0C4FF', sport2: '#BDB2FF', other1: '#FFC6FF', other2: '#FFFFFC' }; return colors[type] || '#FFB3C6'; }
+
+    async function showRecordDetail(id) {
+        const records = await Store.getRecords(); const record = records.find(r => r.id === id); if (!record) return;
+        const date = new Date(record.time); const timeStr = isNaN(date.getTime()) ? '未知时间' : date.toLocaleString('zh-CN'); let extraHtml = '';
+        const extraData = record.extra_data || record.extraData; if (extraData) { Object.keys(extraData).forEach(key => { const label = key.includes('Type') ? '类型' : (key.includes('Duration') ? '时长' : (key === 'key' ? '密钥' : '描述')); extraHtml += '<div class="modal-detail"><span class="label">' + label + '：</span>' + extraData[key] + '</div>'; }); }
+        let photoSrc = await Store.getPhoto(record);
+        const detailContent = document.getElementById('detailContent');
+        if (detailContent) { const photoHtml = photoSrc ? '<img src="' + photoSrc + '" class="modal-image" alt="打卡照片">' : '<div style="padding:20px; text-align:center; color:var(--text-light);">图片已过期或无法加载</div>'; detailContent.innerHTML = '<div class="modal-title">' + (record.emoji || '❓') + ' ' + (record.type_name || record.typeName || '未知类型') + '</div>' + photoHtml + '<div class="modal-detail"><span class="label">时间：</span>' + timeStr + '</div><div class="modal-detail"><span class="label">积分：</span>' + ((record.score || 0) > 0 ? '+' : '') + (record.score || 0) + ' 分</div>' + extraHtml; }
+        document.getElementById('detailModal').classList.add('active');
+    }
+
+    function closeDetailModal() { document.getElementById('detailModal').classList.remove('active'); }
+
+    async function exportData() {
+        const records = await Store.getRecords(); const today = getToday(); const yesterday = new Date(Date.now() - 86400000).toISOString().split('T')[0]; const recentRecords = records.filter(r => r.date === today || r.date === yesterday);
+        if (recentRecords.length === 0) { showToast('最近两天没有记录哦', 'error'); return; }
+        showToast('正在准备数据...', 'success'); const exportRecords = [];
+        for (let record of recentRecords) { const exportRecord = JSON.parse(JSON.stringify(record)); if (!exportRecord.photo && (exportRecord.photo_id || exportRecord.photoId)) { try { const photoData = await Store.getPhoto(exportRecord); if (photoData) exportRecord.photo = photoData; } catch(e) {} } delete exportRecord.photo_id; delete exportRecord.photoId; exportRecords.push(exportRecord); }
+        const data = { exportDate: new Date().toISOString(), records: exportRecords, totalScore: Storage.get('totalScore') || 0 }; const jsonStr = JSON.stringify(data, null, 2); const blob = new Blob([jsonStr], { type: 'application/json' }); const url = URL.createObjectURL(blob);
+        const a = document.createElement('a'); a.href = url; a.download = '琳琳打卡记录_' + today + '.json'; document.body.appendChild(a); a.click(); document.body.removeChild(a); URL.revokeObjectURL(url); showToast('数据导出成功！📦', 'success');
+    }
+
+    async function generateQR() {
+        const records = await Store.getRecords(); const today = getToday(); const yesterday = new Date(Date.now() - 86400000).toISOString().split('T')[0]; const recentRecords = records.filter(r => r.date === today || r.date === yesterday);
+        if (recentRecords.length === 0) { showToast('最近两天没有记录哦', 'error'); return; }
+        showToast('正在准备数据...', 'success'); const exportRecords = [];
+        for (let record of recentRecords) { const exportRecord = JSON.parse(JSON.stringify(record)); if (!exportRecord.photo && (exportRecord.photo_id || exportRecord.photoId)) { try { const photoData = await Store.getPhoto(exportRecord); if (photoData) exportRecord.photo = photoData; } catch(e) {} } delete exportRecord.photo_id; delete exportRecord.photoId; exportRecords.push(exportRecord); }
+        const data = { exportDate: new Date().toISOString(), records: exportRecords.map(r => ({ id: r.id, type: r.type, typeName: r.type_name || r.typeName, time: r.time, score: r.score, date: r.date, extraData: r.extra_data || r.extraData, photo: r.photo })), totalScore: Storage.get('totalScore') || 0 }; const jsonStr = JSON.stringify(data); const encoded = btoa(unescape(encodeURIComponent(jsonStr)));
+        const qrDisplay = document.getElementById('qrDisplay'); const qrcodeDiv = document.getElementById('qrcode'); if (!qrDisplay || !qrcodeDiv) return; qrcodeDiv.innerHTML = ''; if (encoded.length > 800) { showToast('数据较大，建议使用导出功能', 'error'); return; }
+        if (typeof QRCode !== 'undefined') { new QRCode(qrcodeDiv, { text: encoded, width: 200, height: 200, colorDark: '#FF8FAB', colorLight: '#FFFFFF', correctLevel: QRCode.CorrectLevel.M }); qrDisplay.classList.add('active'); showToast('二维码生成成功！请哥哥扫描', 'success'); } else { showToast('二维码库加载中，请稍后再试', 'error'); }
+    }
+
+    async function submitKey() {
+        const key = document.getElementById('keyInput').value.trim().toUpperCase(); if (!key) { showToast('请输入密钥', 'error'); return; }
+        const keyData = await Store.getValidKey(key);
+        if (keyData) {
+            const score = keyData.score;
+            // 先标记密钥为已使用，防止重复提交
+            await Store.markKeyUsed(key);
+            // 再次验证，确保标记成功（防止并发）
+            const verify = await Store.getValidKey(key);
+            if (verify) { showToast('密钥处理异常，请重试', 'error'); return; }
+            const bonusRecord = { id: Date.now(), type: 'bonus', typeName: '补分奖励', emoji: '✨', time: new Date().toISOString(), score: score, date: getToday(), extraData: { key: key, source: '哥哥补分' } };
+            await Store.insertRecord(bonusRecord); await recalculateAllScores();
+            showToast('补分成功！+' + score + '分 ✨', 'success'); document.getElementById('keyInput').value = ''; updateUI();
+        } else { showToast('密钥无效或已使用', 'error'); }
+    }
+
+    async function updateProfile() {
+        const records = await Store.getRecords();
+        const currentMonth = new Date().getMonth();
+        const currentYear = new Date().getFullYear();
+        const monthRecords = records.filter(r => { const d = new Date(r.time); return d.getMonth() === currentMonth && d.getFullYear() === currentYear; });
+        let monthScore = 0; monthRecords.forEach(r => monthScore += (r.score || 0));
+        const monthCheckinsEl = document.getElementById('monthCheckins');
+        const monthScoreEl = document.getElementById('monthScore');
+        if (monthCheckinsEl) monthCheckinsEl.textContent = monthRecords.length;
+        if (monthScoreEl) monthScoreEl.textContent = monthScore.toFixed(1);
+        await updateStorageInfo();
+    }
+
+    async function updateStorageInfo() {
+        const userId = currentUser?.id || 'linlin';
+        let cloudRecords = 0;
+        let cloudImages = 0;
+        let cloudSize = 0;
+        let sizeExact = false;
+
+        // 1. 当前用户的云端统计
+        if (Store.ready) {
+            try {
+                const { data, error } = await supabaseClient.from('records').select('id').eq('user_id', userId);
+                if (!error && data) cloudRecords = data.length;
+            } catch(e) {}
+            try {
+                const { data, error } = await supabaseClient.storage.from('photos').list(userId);
+                if (!error && data && data.length > 0) {
+                    cloudImages = data.length;
+                    cloudSize = data.reduce((sum, obj) => sum + (obj.metadata?.size || 0), 0);
+                    sizeExact = true;
+                }
+            } catch(e) {}
+            if (!sizeExact) {
+                cloudSize = cloudRecords * 200 * 1024;
+            }
+        } else {
+            const localRecs = Storage.get('records') || [];
+            cloudRecords = localRecs.length;
+            cloudSize = cloudRecords * 200 * 1024;
+        }
+
+        // 2. 当前用户的本地记录数
+        const localRecs = Storage.get('records') || [];
+        const localRecordsCount = localRecs.length;
+
+        // 3. 当前用户的 localStorage 大小
+        let myLocalSize = 0;
+        const prefix = 'u_' + userId + '_';
+        for (let key in localStorage) {
+            if (localStorage.hasOwnProperty(key) && key.startsWith(prefix)) {
+                myLocalSize += localStorage[key].length * 2;
+            }
+        }
+
+        // 4. 当前用户的 IndexedDB 大小（真实抽样）
+        let dbSize = 0;
+        try { dbSize = await DB.getDBSize(); } catch(e) {}
+
+        // 5. 网页开销（JS 运行时、缓存、DOM 等固定开销）
+        const appOverhead = 55 * 1024 * 1024;
+
+        // 6. 当前用户总使用
+        const myTotalUsed = cloudSize + myLocalSize + dbSize + appOverhead;
+
+        // 7. 全局本地统计（所有用户的 localStorage）
+        let allLocalSize = 0;
+        for (let key in localStorage) {
+            if (localStorage.hasOwnProperty(key) && key.startsWith('u_')) {
+                allLocalSize += localStorage[key].length * 2;
+            }
+        }
+
+        // 8. 全局总使用（云端只能看到当前用户，本地能看到所有用户）
+        const globalTotalUsed = cloudSize + allLocalSize + dbSize + appOverhead;
+
+        const limit = 1024 * 1024 * 1024;
+        const remaining = Math.max(0, limit - globalTotalUsed);
+        const usedPercent = limit > 0 ? Math.min(100, (globalTotalUsed / limit * 100).toFixed(1)) : 0;
+        const sizeLabel = sizeExact ? '' : ' (估算)';
+
+        // 9. 预计可再存（基于当前用户的真实平均记录大小）
+        const avgRecordSize = localRecordsCount > 0 ? Math.round(myTotalUsed / localRecordsCount) : 200 * 1024;
+        const estimatedRecords = Math.floor(remaining / avgRecordSize);
+
+        const usedEl = document.getElementById('storageUsed');
+        const remainingEl = document.getElementById('storageRemaining');
+        const recordsEl = document.getElementById('storageRecords');
+        const estimateEl = document.getElementById('storageEstimate');
+        const progressBar = document.getElementById('storageProgressBar');
+        const warning = document.getElementById('storageWarning');
+
+        if (usedEl) usedEl.textContent = formatBytes(myTotalUsed) + sizeLabel + ' · 本地' + formatBytes(myLocalSize + dbSize) + ' · 云端' + formatBytes(cloudSize);
+        if (remainingEl) remainingEl.textContent = formatBytes(remaining) + ' / 1GB';
+        if (recordsEl) recordsEl.textContent = localRecordsCount + ' 条 (本地' + (cloudRecords > 0 ? '+' + cloudRecords + '云端' : '') + ')';
+        if (estimateEl) estimateEl.textContent = '约 ' + formatBytes(remaining) + ' · ' + estimatedRecords + ' 条';
+        if (progressBar) {
+            progressBar.style.width = usedPercent + '%';
+            if (usedPercent > 80) progressBar.style.background = 'linear-gradient(90deg, #FF6B6B, #FF8E8E)';
+            else if (usedPercent > 50) progressBar.style.background = 'linear-gradient(90deg, #FFD93D, #FF8E8E)';
+            else progressBar.style.background = 'linear-gradient(90deg, var(--primary), var(--primary-light))';
+        }
+        if (warning) warning.style.display = usedPercent > 80 ? 'block' : 'none';
+    }
+
+    function formatBytes(bytes) { if (bytes === 0) return '0 B'; const k = 1024; const sizes = ['B', 'KB', 'MB', 'GB']; const i = Math.min(Math.floor(Math.log(bytes) / Math.log(k)), sizes.length - 1); return parseFloat((bytes / Math.pow(k, i)).toFixed(1)) + ' ' + sizes[i]; }
+</script>
+</body>
+</html>
